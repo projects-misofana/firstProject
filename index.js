@@ -8,7 +8,6 @@ const http = require("http");
 const {Server} = require("socket.io")
 const jwtDecode = require("jwt-decode")
 
-
 const router = require("./accounts/routes/userrouter")
 const {json} = require("express");
 
@@ -29,8 +28,8 @@ mongoose.connect(db).then(() => {
         res.sendFile(join(__dirname, "/login/login.html"))
     })
 
-    app.get("/zalupa", (req, res) => {
-        res.sendFile(join(__dirname, "/game/game_1.html"))
+    app.get("/profile", (req, res) => {
+        res.sendFile(join(__dirname, "/profile/profile.html"))
     })
 
 
@@ -40,7 +39,7 @@ mongoose.connect(db).then(() => {
 
     io.on('connection', (socket) => {
         socket.on('chat message', (data) => {
-            const { username, message } = data;
+            const {username, message} = data;
             const user = {
                 username: username,
                 message: message
@@ -53,9 +52,9 @@ mongoose.connect(db).then(() => {
             !users.some((user) => user.username === username) &&
             users.push({
                 username: jwtDecode.jwtDecode(token).username,
-                socketId: socket.id
+                socketId: socket.id,
+                token: token
             })
-            console.log(users)
 
             io.emit("users", users)
         })

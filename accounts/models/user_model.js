@@ -7,6 +7,15 @@ const userSchema = new mongoose.Schema({
     },
     password: String,
     token: String,
+    friends: [{
+        type: {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            isConfirmed: Boolean
+        }
+    }],
     createAt: {
         type: Date,
         default: Date.now()

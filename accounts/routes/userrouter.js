@@ -39,4 +39,25 @@ userrouter.post("/login", async (req, res) => {
     }
 })
 
+userrouter.post("/friend", authValidator, async (req, res) => {
+    const {userId} = req.body
+    try {
+        const friend = await User.findById(userId)
+        const user = req.user
+
+        if (!friend)
+            return res.status(404).json({error: "Friend not found"})
+
+        const isRequest = user.friends.some(friend1 => friend1.user.equals(friend._id))
+        if (isRequest) {
+            console.log("HAHA")
+        } else {
+            console.log('HIHI')
+        }
+        return res.status(200).json({message: "Request sent"})
+    } catch (e) {
+        return res.status(500).json({error: e.message})
+    }
+})
+
 module.exports = userrouter
