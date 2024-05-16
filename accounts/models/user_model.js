@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
             },
-            isConfirmed: Boolean
+            isConfirmed: Boolean,
+            isSender: Boolean,
         }
     }],
     createAt: {

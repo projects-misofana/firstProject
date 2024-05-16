@@ -2,7 +2,7 @@ const express = require("express")
 const cors = require("cors")
 const logger = require("morgan")
 const mongoose = require("mongoose")
-const {db, port} = require("./configs/vars")
+const {db, port, dev_url} = require("./configs/vars")
 const {join} = require("node:path")
 const http = require("http");
 const {Server} = require("socket.io")
@@ -48,12 +48,14 @@ mongoose.connect(db).then(() => {
         });
 
         socket.on("token", (token) => {
-            const username = jwtDecode.jwtDecode(token).username
-            !users.some((user) => user.username === username) &&
+            const user1 = jwtDecode.jwtDecode(token)
+            console.log(user1)
+            !users.some((user) => user.username === user1.username) &&
             users.push({
-                username: jwtDecode.jwtDecode(token).username,
+                username: user1.username,
                 socketId: socket.id,
-                token: token
+                token: token,
+                friends: user1.friends
             })
 
             io.emit("users", users)
@@ -65,7 +67,7 @@ mongoose.connect(db).then(() => {
     });
 
     server.listen(port, () => {
-        console.log(`Listening http://localhost:${port}`)
+        console.log(`Listening ${dev_url}${port}`)
     })
 
 }).catch(() => {

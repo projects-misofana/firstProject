@@ -7,6 +7,8 @@ const User = require("../models/user_model")
 const {secret_kay} = require("../../configs/vars")
 const authValidator = require("../../validators/authValidator")
 
+let users = []
+
 userrouter.post("/login", async (req, res) => {
     const {username, password} = req.body
     let newUser;
@@ -19,7 +21,8 @@ userrouter.post("/login", async (req, res) => {
             console.log("Created")
             newUser = new User({
                 username: username,
-                password: await bcrypt.hash(password, 10)
+                password: await bcrypt.hash(password, 10),
+                friends: []
             })
             await newUser.save()
             const token = await jwt.sign({_id: newUser._id, username: newUser.username}, secret_kay)
@@ -30,7 +33,7 @@ userrouter.post("/login", async (req, res) => {
         const compare = await bcrypt.compare(password, user.password)
         if (!compare)
             return res.status(401).json({error: "Huiovo"})
-        const token = await jwt.sign({_id: user._id, username: user.username}, secret_kay)
+        const token = await jwt.sign({_id: user._id, username: user.username, friends: user.friends}, secret_kay)
         user.token = token
         await user.save()
         return res.status(200).json({user: user, token: token})
@@ -49,11 +52,13 @@ userrouter.post("/friend", authValidator, async (req, res) => {
             return res.status(404).json({error: "Friend not found"})
 
         const isRequest = user.friends.some(friend1 => friend1.user.equals(friend._id))
-        if (isRequest) {
-            console.log("HAHA")
-        } else {
-            console.log('HIHI')
+        if (!isRequest) {
+            user.friends.push({user: userId, isConfirmed: false, isSender: true})
+            friend.friends.push({user: user._id, isConfirmed: false, isSender: false})
+            await user.save()
+            await friend.save()
         }
+
         return res.status(200).json({message: "Request sent"})
     } catch (e) {
         return res.status(500).json({error: e.message})

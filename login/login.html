@@ -26,8 +26,9 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
+<script type="module">
     const form = document.getElementById('registrationForm');
+    const url = `http://localhost:5000`
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -36,7 +37,7 @@
         const password = document.getElementById('password').value;
 
         try {
-            const response = await axios.post(`https://7957-178-212-96-175.ngrok-free.app/login`, {
+            const response = await axios.post(`${url}/login/`, {
                 username: username,
                 password: password
             })
