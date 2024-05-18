@@ -24,47 +24,15 @@ mongoose.connect(db).then(() => {
     app.use(logger("dev"))
     app.use(json())
     app.use("/", router)
+
     app.get("/", (req, res) => {
         res.sendFile(join(__dirname, "/login/login.html"))
     })
 
-    app.get("/profile", (req, res) => {
-        res.sendFile(join(__dirname, "/profile/profile.html"))
+    app.get("/room", (req, res) => {
+        res.sendFile(join(__dirname, "/room/room.html"))
     })
 
-
-    io.engine.on("connection_error", (err) => {
-        console.log(err);
-    });
-
-    io.on('connection', (socket) => {
-        socket.on('chat message', (data) => {
-            const {username, message} = data;
-            const user = {
-                username: username,
-                message: message
-            }
-            io.emit('chat message', user);
-        });
-
-        socket.on("token", (token) => {
-            const user1 = jwtDecode.jwtDecode(token)
-            console.log(user1)
-            !users.some((user) => user.username === user1.username) &&
-            users.push({
-                username: user1.username,
-                socketId: socket.id,
-                token: token,
-                friends: user1.friends
-            })
-
-            io.emit("users", users)
-        })
-        socket.on('disconnect', () => {
-            users = users.filter(user => user.socketId !== socket.id)
-            io.emit("users", users)
-        });
-    });
 
     server.listen(port, () => {
         console.log(`Listening ${dev_url}${port}`)
@@ -73,3 +41,32 @@ mongoose.connect(db).then(() => {
 }).catch(() => {
     console.log("Disconnected")
 })
+
+io.on('connection', (socket) => {
+    socket.on('chat message', (data) => {
+        const {username, message} = data;
+        const user = {
+            username: username,
+            message: message
+        }
+        io.emit('chat message', user);
+    });
+
+    socket.on("token", (token) => {
+        const user1 = jwtDecode.jwtDecode(token)
+        console.log(user1)
+        !users.some((user) => user.username === user1.username) &&
+        users.push({
+            username: user1.username,
+            socketId: socket.id,
+            token: token,
+            friends: user1.friends
+        })
+
+        io.emit("users", users)
+    })
+    socket.on('disconnect', () => {
+        users = users.filter(user => user.socketId !== socket.id)
+        io.emit("users", users)
+    });
+});

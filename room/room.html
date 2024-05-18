@@ -40,11 +40,12 @@
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
         integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous">
+</script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-    const localhost = "http://localhost:5000"
+    const url = "http://localhost:5000"
 
     function parseJwt(token) {
         const base64Url = token.split('.')[1];
@@ -95,7 +96,6 @@
     })
 
     const clickAdd = (userId) => {
-        const url = `${localhost}/friend`;
         const headers = {
             'Authorization': `Bearer ${token}`
         };
@@ -108,7 +108,6 @@
                 console.error(error.message)
             });
     };
-
 
     socket.on("users", (data) => {
         data = data.filter(user => user.username !== currentUser.username)
